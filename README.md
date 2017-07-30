@@ -1,24 +1,19 @@
-# wget-improved
+# node-wget-promise
 
-wget-improved simplifies retrieving files from any URL
+node-wget-promise simplifies retrieving files from any URL, with Promise support.
 
-Improvements over [wuchengwei/node-wget](https://github.com/wuchengwei/node-wget)
-- Handles 302 redirects (including infinite redirect loops)
-- Passes URL parameters
-- Better error reporting
-- Does not write using append (uses w+ identical to wget)
-- Handles gzip compression, allow you to automatically gunzip the stream
+> This package is forked and enhanced from [wget-improved](https://github.com/bearjaws/node-wget)
 
 ## Install
 
 ```
-npm install wget-improved --save
+npm install node-wget-promise --save
 ```
 
 ## download(src, output, options)
 
 ```js
-var wget = require('wget-improved');
+var wget = require('node-wget-promise');
 var src = 'http://nodejs.org/images/logo.svg';
 var output = '/tmp/logo.svg';
 var options = {

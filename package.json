@@ -1,7 +1,7 @@
 {
-  "name": "wget-promise",
+  "name": "node-wget-promise",
   "version": "0.0.1",
-  "description": "wget in nodejs, returned in promise, forked from bearjaws/node-wget",
+  "description": "wget in Node with Promise support, forked from bearjaws/node-wget",
   "author": "AJ Hsu <im.ajhsu@gmail.com>",
   "license": "MIT",
   "scripts": {
