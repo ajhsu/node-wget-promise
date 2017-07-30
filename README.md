@@ -2,6 +2,10 @@
 
 node-wget-promise simplifies retrieving files from any URL, with Promise support.
 
+[![npm](https://img.shields.io/npm/v/node-wget-promise.svg)](https://www.npmjs.com/package/node-wget-promise)
+[![Build Status](https://travis-ci.org/ajhsu/node-wget-promise.svg?branch=master)](https://travis-ci.org/ajhsu/node-wget-promise)
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+
 > This package is forked and enhanced from [wget-improved](https://github.com/bearjaws/node-wget)
 
 ## Install
