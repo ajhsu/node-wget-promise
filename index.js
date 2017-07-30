@@ -1,1 +1,1 @@
-export default require('./build/wget');
+module.exports = require('./build/wget');
