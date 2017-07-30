@@ -10,7 +10,7 @@ nwget https://raw.github.com/Fyrd/caniuse/master/data.json -O /tmp/data.json
 
 **/
 
-var wget = require('../lib/wget');
+var wget = require('../build/wget');
 var path = require('path');
 
 var args = require('minimist')(process.argv);
