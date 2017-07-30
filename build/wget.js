@@ -1,12 +1,36 @@
 'use strict';
 
-var http = require('http');
-var https = require('https');
-var tunnel = require('tunnel');
-var url = require('url');
-var zlib = require('zlib');
-var fs = require('fs');
-var EventEmitter = require('events').EventEmitter;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _http = require('http');
+
+var _http2 = _interopRequireDefault(_http);
+
+var _https = require('https');
+
+var _https2 = _interopRequireDefault(_https);
+
+var _tunnel = require('tunnel');
+
+var _tunnel2 = _interopRequireDefault(_tunnel);
+
+var _url = require('url');
+
+var _url2 = _interopRequireDefault(_url);
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _zlib = require('zlib');
+
+var _zlib2 = _interopRequireDefault(_zlib);
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _events = require('events');
 
 /**
  * Downloads a file using http get and request
@@ -18,10 +42,13 @@ var EventEmitter = require('events').EventEmitter;
  * @returns {*|EventEmitter}
  */
 function download(src, output, options, _parentEvent, redirects) {
+  if (typeof output === 'undefined') {
+    output = _path2['default'].basename(_url2['default'].parse(src).pathname);
+  }
   if (typeof redirects === 'undefined') {
     redirects = 0;
   }
-  var downloader = _parentEvent || new EventEmitter(),
+  var downloader = _parentEvent || new _events.EventEmitter(),
       srcUrl,
       tunnelAgent,
       req;
@@ -33,7 +60,7 @@ function download(src, output, options, _parentEvent, redirects) {
       gunzip: false
     };
   }
-  srcUrl = url.parse(src);
+  srcUrl = _url2['default'].parse(src);
   srcUrl.protocol = cleanProtocol(srcUrl.protocol);
 
   req = request({
@@ -46,7 +73,7 @@ function download(src, output, options, _parentEvent, redirects) {
     method: 'GET'
   }, function (res) {
     var fileSize, writeStream, downloadedSize;
-    var gunzip = zlib.createGunzip();
+    var gunzip = _zlib2['default'].createGunzip();
 
     // Handle 302 redirects
     if (res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307) {
@@ -60,7 +87,7 @@ function download(src, output, options, _parentEvent, redirects) {
     if (res.statusCode === 200) {
       downloadedSize = 0;
       fileSize = res.headers['content-length'];
-      writeStream = fs.createWriteStream(output, {
+      writeStream = _fs2['default'].createWriteStream(output, {
         flags: 'w+',
         encoding: 'binary'
       });
@@ -128,9 +155,9 @@ function request(options, callback) {
         }
       }
       if (options.proxy.protocol === 'http') {
-        options.agent = tunnel.httpOverHttp({ proxy: newProxy });
+        options.agent = _tunnel2['default'].httpOverHttp({ proxy: newProxy });
       } else if (options.proxy.protocol === 'https') {
-        options.agent = tunnel.httpOverHttps({ proxy: newProxy });
+        options.agent = _tunnel2['default'].httpOverHttps({ proxy: newProxy });
       } else {
         throw options.proxy.protocol + ' proxy is not supported!';
       }
@@ -140,7 +167,7 @@ function request(options, callback) {
         newOptions[key] = options[key];
       }
     }
-    return http.request(newOptions, callback);
+    return _http2['default'].request(newOptions, callback);
   }
   if (options.protocol === 'https') {
     if (options.proxy) {
@@ -150,9 +177,9 @@ function request(options, callback) {
         }
       }
       if (options.proxy.protocol === 'http') {
-        options.agent = tunnel.httpsOverHttp({ proxy: newProxy });
+        options.agent = _tunnel2['default'].httpsOverHttp({ proxy: newProxy });
       } else if (options.proxy.protocol === 'https') {
-        options.agent = tunnel.httpsOverHttps({ proxy: newProxy });
+        options.agent = _tunnel2['default'].httpsOverHttps({ proxy: newProxy });
       } else {
         throw options.proxy.protocol + ' proxy is not supported!';
       }
@@ -162,7 +189,7 @@ function request(options, callback) {
         newOptions[key] = options[key];
       }
     }
-    return https.request(newOptions, callback);
+    return _https2['default'].request(newOptions, callback);
   }
   throw 'only allow http or https request!';
 }
@@ -172,7 +199,7 @@ function parseOptions(type, options) {
   if (type === 'download') {
     if (options.proxy) {
       if (typeof options.proxy === 'string') {
-        proxy = url.parse(options.proxy);
+        proxy = _url2['default'].parse(options.proxy);
         options.proxy = {};
         options.proxy.protocol = cleanProtocol(proxy.protocol);
         options.proxy.host = proxy.hostname;
@@ -191,7 +218,7 @@ function parseOptions(type, options) {
 
     if (options.proxy) {
       if (typeof options.proxy === 'string') {
-        proxy = url.parse(options.proxy);
+        proxy = _url2['default'].parse(options.proxy);
         options.proxy = {};
         options.proxy.protocol = cleanProtocol(proxy.protocol);
         options.proxy.host = proxy.hostname;
