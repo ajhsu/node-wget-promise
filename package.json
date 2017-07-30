@@ -14,7 +14,6 @@
   },
   "homepage": "https://github.com/ajhsu/node-wget-promise#readme",
   "dependencies": {
-    "minimist": "1.2.0",
     "tunnel": "0.0.2"
   },
   "devDependencies": {

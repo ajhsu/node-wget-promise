@@ -5,130 +5,102 @@ import url from 'url';
 import path from 'path';
 import zlib from 'zlib';
 import fs from 'fs';
-import { EventEmitter } from 'events';
 
 /**
  * Downloads a file using http get and request
  * @param {string} src - The http URL to download from
  * @param {string} output - The filepath to save to
  * @param {object} options - Options object
- * @param {object} _parentEvent - Used for when their is a 302 redirect and need to maintain state to a new request
- * @param {number} redirects - The number of redirects, used to prevent infinite loops
- * @returns {*|EventEmitter}
+ * @returns {Promise}
  */
-function download(src, output, options, _parentEvent, redirects) {
-  if (typeof output === 'undefined') {
-    output = path.basename(url.parse(src).pathname);
-  }
-  if (typeof redirects === 'undefined') {
-    redirects = 0;
-  }
-  var downloader = _parentEvent || new EventEmitter(),
-    srcUrl,
-    tunnelAgent,
-    req;
-
-  if (options) {
-    options = parseOptions('download', options);
-  } else {
-    options = {
-      gunzip: false
-    };
-  }
-  srcUrl = url.parse(src);
-  srcUrl.protocol = cleanProtocol(srcUrl.protocol);
-
-  req = request(
-    {
-      protocol: srcUrl.protocol,
-      host: srcUrl.hostname,
-      port: srcUrl.port,
-      path: srcUrl.pathname + (srcUrl.search || ''),
-      proxy: options ? options.proxy : undefined,
-      auth: options.auth ? options.auth : undefined,
-      method: 'GET'
-    },
-    function(res) {
-      var fileSize, writeStream, downloadedSize;
-      var gunzip = zlib.createGunzip();
-
-      // Handle 302 redirects
-      if (
-        res.statusCode === 301 ||
-        res.statusCode === 302 ||
-        res.statusCode === 307
-      ) {
-        redirects++;
-        if (redirects >= 10) {
-          downloader.emit('error', 'Infinite redirect loop detected');
-        }
-        download(res.headers.location, output, options, downloader, redirects);
-      }
-
-      if (res.statusCode === 200) {
-        downloadedSize = 0;
-        fileSize = res.headers['content-length'];
-        writeStream = fs.createWriteStream(output, {
-          flags: 'w+',
-          encoding: 'binary'
-        });
-
-        res.on('error', function(err) {
-          writeStream.end();
-          downloader.emit('error', err);
-        });
-
-        var encoding = '';
-        if (typeof res.headers['content-encoding'] === 'string') {
-          encoding = res.headers['content-encoding'];
-        }
-
-        // If the user has specified to unzip, and the file is gzip encoded, pipe to gunzip
-        if (options.gunzip === true && encoding === 'gzip') {
-          res.pipe(gunzip);
-        } else {
-          res.pipe(writeStream);
-        }
-
-        //emit a start event so the user knows the file-size he's gonna receive
-        downloader.emit('start', fileSize);
-
-        // Data handlers
-        res.on('data', function(chunk) {
-          downloadedSize += chunk.length;
-          downloader.emit('progress', downloadedSize / fileSize);
-        });
-        gunzip.on('data', function(chunk) {
-          writeStream.write(chunk);
-        });
-
-        writeStream.on('finish', function() {
-          writeStream.end();
-          downloader.emit('end', 'Finished writing to disk');
-          req.end('finished');
-        });
-      } else if (
-        res.statusCode !== 200 &&
-        res.statusCode !== 301 &&
-        res.statusCode !== 302
-      ) {
-        downloader.emit(
-          'error',
-          'Server responded with unhandled status: ' + res.statusCode
-        );
-      }
+function download(src, output, options) {
+  return new Promise((y, n) => {
+    if (typeof output === 'undefined') {
+      output = path.basename(url.parse(src).pathname);
     }
-  );
 
-  req.end('done');
-  req.on('error', function(err) {
-    downloader.emit('error', err);
+    if (options) {
+      options = parseOptions('download', options);
+    } else {
+      options = {
+        gunzip: false
+      };
+    }
+
+    var srcUrl = url.parse(src);
+    srcUrl.protocol = cleanProtocol(srcUrl.protocol);
+
+    var req = request(
+      {
+        protocol: srcUrl.protocol,
+        host: srcUrl.hostname,
+        port: srcUrl.port,
+        path: srcUrl.pathname + (srcUrl.search || ''),
+        proxy: options ? options.proxy : undefined,
+        auth: options.auth ? options.auth : undefined,
+        method: 'GET'
+      },
+      function(res) {
+        if (res.statusCode === 200) {
+          var gunzip = zlib.createGunzip();
+          var fileSize = parseInt(res.headers['content-length']);
+          var downloadedSize = 0;
+          var encoding = '';
+
+          // Create write stream
+          var writeStream = fs.createWriteStream(output, {
+            flags: 'w+',
+            encoding: 'binary'
+          });
+
+          res.on('error', function(err) {
+            writeStream.end();
+            n(err);
+          });
+
+          if (typeof res.headers['content-encoding'] === 'string') {
+            encoding = res.headers['content-encoding'];
+          }
+
+          // If the user has specified to unzip, and the file is gzip encoded, pipe to gunzip
+          if (options.gunzip === true && encoding === 'gzip') {
+            res.pipe(gunzip);
+          } else {
+            res.pipe(writeStream);
+          }
+
+          //emit a start event so the user knows the file-size he's gonna receive
+          console.log('start', fileSize);
+
+          // Data handlers
+          res.on('data', function(chunk) {
+            downloadedSize += chunk.length;
+            console.log('progress', downloadedSize / fileSize);
+          });
+          gunzip.on('data', function(chunk) {
+            writeStream.write(chunk);
+          });
+
+          writeStream.on('finish', function() {
+            writeStream.end();
+            console.log('end', 'Finished writing to disk');
+            req.end('finished');
+            y({ fileSize });
+          });
+          
+        } else if (
+          res.statusCode !== 200 &&
+          res.statusCode !== 301 &&
+          res.statusCode !== 302
+        ) {
+          n('Server responded with unhandled status: ' + res.statusCode);
+        }
+      }
+    );
+
+    req.end('done');
+    req.on('error', err => n(err));
   });
-  // Attach request to our EventEmitter for backwards compatibility, enables actions such as
-  // req.abort();
-  downloader.req = req;
-
-  return downloader;
 }
 
 function request(options, callback) {
@@ -226,5 +198,4 @@ function cleanProtocol(str) {
   return str.trim().toLowerCase().replace(/:$/, '');
 }
 
-exports.download = download;
-exports.request = request;
+export default download;

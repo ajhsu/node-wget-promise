@@ -7,60 +7,26 @@ const expect = require('chai').expect;
 describe('Download Tests', function() {
   this.timeout(30 * 1000);
 
-  it('Should download the NPM logo', function(done) {
-    let download = wget.download(
-      'https://www.npmjs.com/static/images/npm-logo.svg',
-      'npm-logo.svg'
-    );
-
-    download.on('error', function(err) {
-      console.log(err);
-      expect(err).to.be.null;
-    });
-    download.on('start', function(fileSize) {
-      expect(fileSize).to.be.a('string');
-      fileSize = Number(fileSize);
-      expect(fileSize).to.be.above(200);
-      expect(fileSize).to.be.below(500);
-    });
-    download.on('end', function(output) {
-      expect(output).to.equal('Finished writing to disk');
-      // Check if file existed
-      expect(fs.existsSync('npm-logo.svg')).to.be.true;
-      // Delete download file
-      fs.unlinkSync('npm-logo.svg');
-      done();
-    });
-    download.on('progress', function(progress) {
-      expect(progress).to.be.above(0);
-    });
-  });
-
-  it('Should download the NPM logo without given output path', function(done) {
-    let download = wget.download(
-      'https://www.npmjs.com/static/images/npm-logo.svg?query=string'
-    );
-
-    download.on('error', function(err) {
-      console.log(err);
-      expect(err).to.be.null;
-    });
-    download.on('start', function(fileSize) {
-      expect(fileSize).to.be.a('string');
-      fileSize = Number(fileSize);
-      expect(fileSize).to.be.above(200);
-      expect(fileSize).to.be.below(500);
-    });
-    download.on('end', function(output) {
-      expect(output).to.equal('Finished writing to disk');
-      // Check if file existed
-      expect(fs.existsSync('npm-logo.svg')).to.be.true;
-      // Delete download file
-      fs.unlinkSync('npm-logo.svg');
-      done();
-    });
-    download.on('progress', function(progress) {
-      expect(progress).to.be.above(0);
-    });
+  it.only('Should download the NPM logo', function(done) {
+    const Bytes = 1024;
+    const fileName = 'open-graph.png';
+    wget(
+      'https://www.npmjs.com/static/images/touch-icons/open-graph.png',
+      fileName
+    )
+      .then(result => {
+        expect(result.fileSize).to.be.a('number');
+        expect(result.fileSize).to.be.above(0 * Bytes);
+        expect(result.fileSize).to.be.below(50 * Bytes);
+        // Check if file existed
+        expect(fs.existsSync(fileName)).to.be.true;
+        // Delete download file
+        fs.unlinkSync(fileName);
+        done();
+      })
+      .catch(err => {
+        console.log(err);
+        expect(err).to.be.null;
+      });
   });
 });

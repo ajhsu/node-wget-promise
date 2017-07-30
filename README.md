@@ -14,62 +14,17 @@ node-wget-promise simplifies retrieving files from any URL, with Promise support
 npm install node-wget-promise --save
 ```
 
-## download(src, output, options)
+## wget(src, output, options)
 
 ```js
 var wget = require('node-wget-promise');
 var src = 'http://nodejs.org/images/logo.svg';
-var output = '/tmp/logo.svg';
 var options = {
     // see options below
 };
-var download = wget.download(src, output, options);
-download.on('error', function(err) {
-    console.log(err);
-});
-download.on('start', function(fileSize) {
-    console.log(fileSize);
-});
-download.on('end', function(output) {
-    console.log(output);
-});
-download.on('progress', function(progress) {
-    // code to show progress bar
-});
-```
-
-## request(options, callback)
-
-```js
-var wget = require('wget');
-var options = {
-    protocol: 'https',
-    host: 'raw.github.com',
-    path: '/Fyrd/caniuse/master/data.json',
-    proxy: 'http://host:port',
-    method: 'GET'
-};
-var req = wget.request(options, function(res) {
-    var content = '';
-    if (res.statusCode === 200) {
-        res.on('error', function(err) {
-            console.log(err);
-        });
-        res.on('data', function(chunk) {
-            content += chunk;
-        });
-        res.on('end', function() {
-            console.log(content);
-        });
-    } else {
-        console.log('Server respond ' + res.statusCode);
-    }
-});
-
-req.end();
-req.on('error', function(err) {
-    console.log(err);
-});
+wget(src, options)
+  .then(result => console.log(result))
+  .catch(err => console.log(err));
 ```
 
 ## options
@@ -85,16 +40,6 @@ options = {}
         options.proxy.port = 1337;
         options.proxy.proxyAuth = '{basic auth}';
         options.proxy.headers = {'User-Agent': 'Node'};
-```
-
-## CLI
-
-```bash
-# If installed globally
-nwget https://raw.github.com/Fyrd/caniuse/master/data.json -O /tmp/data.json
-
-# If not installed globally
-./node_modules/.bin/nwget https://raw.github.com/Fyrd/caniuse/master/data.json -O /tmp/data.json
 ```
 
 ## Todo
