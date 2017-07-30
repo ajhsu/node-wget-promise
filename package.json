@@ -4,9 +4,15 @@
   "description": "wget in Node with Promise support, forked from bearjaws/node-wget",
   "author": "AJ Hsu <im.ajhsu@gmail.com>",
   "license": "MIT",
-  "scripts": {
-    "test": "./node_modules/.bin/mocha"
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajhsu/node-wget-promise.git"
   },
+  "bugs": {
+    "url": "https://github.com/ajhsu/node-wget-promise/issues"
+  },
+  "homepage": "https://github.com/ajhsu/node-wget-promise#readme",
   "dependencies": {
     "minimist": "1.2.0",
     "tunnel": "0.0.2"
@@ -14,5 +20,8 @@
   "devDependencies": {
     "chai": "^4.0.2",
     "mocha": "^3.4.2"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
   }
 }
