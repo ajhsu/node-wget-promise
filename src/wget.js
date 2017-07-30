@@ -1,12 +1,11 @@
-'use strict';
-
-var http = require('http');
-var https = require('https');
-var tunnel = require('tunnel');
-var url = require('url');
-var zlib = require('zlib');
-var fs = require('fs');
-var EventEmitter = require('events').EventEmitter;
+import http from 'http';
+import https from 'https';
+import tunnel from 'tunnel';
+import url from 'url';
+import path from 'path';
+import zlib from 'zlib';
+import fs from 'fs';
+import { EventEmitter } from 'events';
 
 /**
  * Downloads a file using http get and request
