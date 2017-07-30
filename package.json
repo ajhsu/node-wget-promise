@@ -4,6 +4,9 @@
   "description": "wget in nodejs, returned in promise, forked from bearjaws/node-wget",
   "author": "AJ Hsu <im.ajhsu@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
   "dependencies": {
     "minimist": "1.2.0",
     "tunnel": "0.0.2"

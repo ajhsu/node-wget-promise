@@ -1,3 +1,5 @@
+'use strict';
+
 let wget = require('../lib/wget');
 let expect = require('chai').expect;
 
