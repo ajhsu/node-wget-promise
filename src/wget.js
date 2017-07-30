@@ -17,6 +17,9 @@ import { EventEmitter } from 'events';
  * @returns {*|EventEmitter}
  */
 function download(src, output, options, _parentEvent, redirects) {
+  if (typeof output === 'undefined') {
+    output = path.basename(url.parse(src).pathname);
+  }
   if (typeof redirects === 'undefined') {
     redirects = 0;
   }
