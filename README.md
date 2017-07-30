@@ -20,7 +20,7 @@ npm install node-wget-promise --save
 var wget = require('node-wget-promise');
 var src = 'http://nodejs.org/images/logo.svg';
 var options = {
-    // see options below
+  // see options below
 };
 wget(src, options)
   .then(result => console.log(result))
@@ -32,14 +32,14 @@ wget(src, options)
 ```js
 
 options = {}
-    // Set to true to have any gzip stream automatically decompressed before saving
-    options.gunzip = false;
-    options.proxy = {};
-        options.proxy.protocol = 'http';
-        options.proxy.host = 'someproxy.org';
-        options.proxy.port = 1337;
-        options.proxy.proxyAuth = '{basic auth}';
-        options.proxy.headers = {'User-Agent': 'Node'};
+// Set to true to have any gzip stream automatically decompressed before saving
+options.gunzip = false;
+options.proxy = {};
+options.proxy.protocol = 'http';
+options.proxy.host = 'someproxy.org';
+options.proxy.port = 1337;
+options.proxy.proxyAuth = '{basic auth}';
+options.proxy.headers = {'User-Agent': 'Node'};
 ```
 
 ## Todo
