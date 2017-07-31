@@ -10,11 +10,17 @@ describe('Download Tests', function() {
   it.only('Should download the NPM logo', function(done) {
     const Bytes = 1024;
     const fileName = 'open-graph.png';
-    wget(
-      'https://www.npmjs.com/static/images/touch-icons/open-graph.png',
-      fileName
-    )
+    wget('https://www.npmjs.com/static/images/touch-icons/open-graph.png', {
+      onStart: headers => {
+        expect(headers['content-type']).to.be.eqls('image/png');
+      },
+      onProgress: progress => {
+        console.log('downloaded', progress, '%');
+      },
+      output: fileName
+    })
       .then(result => {
+        expect(result.headers['content-type']).to.be.eqls('image/png');
         expect(result.fileSize).to.be.a('number');
         expect(result.fileSize).to.be.above(0 * Bytes);
         expect(result.fileSize).to.be.below(50 * Bytes);

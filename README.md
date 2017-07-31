@@ -20,11 +20,14 @@ npm install node-wget-promise --save
 var wget = require('node-wget-promise');
 var src = 'http://nodejs.org/images/logo.svg';
 var options = {
+  onStart: <Callback>,
+  onProgress: <Callback>,
+  output: <outputFilePath>
   // see options below
 };
 wget(src, options)
-  .then(result => console.log(result))
-  .catch(err => console.log(err));
+  .then(result => <Result>)
+  .catch(err => <Error>);
 ```
 
 ## options

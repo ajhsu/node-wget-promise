@@ -36,33 +36,38 @@ var _fs2 = _interopRequireDefault(_fs);
 
 /**
  * Downloads a file using http get and request
- * @param {string} src - The http URL to download from
- * @param {string} output - The filepath to save to
+ * @param {string} source - The http URL to download from
  * @param {object} options - Options object
  * @returns {Promise}
  */
-function download(src, output, options) {
+function download(source, options) {
   return new Promise(function (y, n) {
-    if (typeof output === 'undefined') {
-      output = _path2['default'].basename(_url2['default'].parse(src).pathname);
+    if (typeof options.gunzip === 'undefined') {
+      options.gunzip = false;
+    }
+    if (typeof options.output === 'undefined') {
+      options.output = _path2['default'].basename(_url2['default'].parse(source).pathname);
+    }
+    if (options.proxy) {
+      if (typeof options.proxy === 'string') {
+        var proxy = _url2['default'].parse(options.proxy);
+        options.proxy = {};
+        options.proxy.protocol = cleanProtocol(proxy.protocol);
+        options.proxy.host = proxy.hostname;
+        options.proxy.port = proxy.port;
+        options.proxy.proxyAuth = proxy.auth;
+        options.proxy.headers = { 'User-Agent': 'Node' };
+      }
     }
 
-    if (options) {
-      options = parseOptions('download', options);
-    } else {
-      options = {
-        gunzip: false
-      };
-    }
-
-    var srcUrl = _url2['default'].parse(src);
-    srcUrl.protocol = cleanProtocol(srcUrl.protocol);
+    var sourceUrl = _url2['default'].parse(source);
+    sourceUrl.protocol = cleanProtocol(sourceUrl.protocol);
 
     var req = request({
-      protocol: srcUrl.protocol,
-      host: srcUrl.hostname,
-      port: srcUrl.port,
-      path: srcUrl.pathname + (srcUrl.search || ''),
+      protocol: sourceUrl.protocol,
+      host: sourceUrl.hostname,
+      port: sourceUrl.port,
+      path: sourceUrl.pathname + (sourceUrl.search || ''),
       proxy: options ? options.proxy : undefined,
       auth: options.auth ? options.auth : undefined,
       method: 'GET'
@@ -74,7 +79,7 @@ function download(src, output, options) {
         var encoding = '';
 
         // Create write stream
-        var writeStream = _fs2['default'].createWriteStream(output, {
+        var writeStream = _fs2['default'].createWriteStream(options.output, {
           flags: 'w+',
           encoding: 'binary'
         });
@@ -95,13 +100,18 @@ function download(src, output, options) {
           res.pipe(writeStream);
         }
 
-        //emit a start event so the user knows the file-size he's gonna receive
-        console.log('start', fileSize);
+        // onStartCallback
+        if (options.onStart) {
+          options.onStart(res.headers);
+        }
 
         // Data handlers
         res.on('data', function (chunk) {
           downloadedSize += chunk.length;
-          console.log('progress', downloadedSize / fileSize);
+          if (options.onProgress) {
+            var progress = downloadedSize / fileSize;
+            options.onProgress(progress);
+          }
         });
         gunzip.on('data', function (chunk) {
           writeStream.write(chunk);
@@ -109,9 +119,8 @@ function download(src, output, options) {
 
         writeStream.on('finish', function () {
           writeStream.end();
-          console.log('end', 'Finished writing to disk');
           req.end('finished');
-          y({ fileSize: fileSize });
+          y({ headers: res.headers, fileSize: fileSize });
         });
       } else if (res.statusCode !== 200 && res.statusCode !== 301 && res.statusCode !== 302) {
         n('Server responded with unhandled status: ' + res.statusCode);
@@ -129,7 +138,7 @@ function request(options, callback) {
   var newOptions = {},
       newProxy = {},
       key;
-  options = parseOptions('request', options);
+  options = parseRequestOptions(options);
   if (options.protocol === 'http') {
     if (options.proxy) {
       for (key in options.proxy) {
@@ -177,43 +186,26 @@ function request(options, callback) {
   throw 'only allow http or https request!';
 }
 
-function parseOptions(type, options) {
-  var proxy;
-  if (type === 'download') {
-    if (options.proxy) {
-      if (typeof options.proxy === 'string') {
-        proxy = _url2['default'].parse(options.proxy);
-        options.proxy = {};
-        options.proxy.protocol = cleanProtocol(proxy.protocol);
-        options.proxy.host = proxy.hostname;
-        options.proxy.port = proxy.port;
-        options.proxy.proxyAuth = proxy.auth;
-        options.proxy.headers = { 'User-Agent': 'Node' };
-      }
-    }
-    return options;
+function parseRequestOptions(options) {
+  if (!options.protocol) {
+    options.protocol = 'http';
   }
-  if (type === 'request') {
-    if (!options.protocol) {
-      options.protocol = 'http';
-    }
-    options.protocol = cleanProtocol(options.protocol);
+  options.protocol = cleanProtocol(options.protocol);
 
-    if (options.proxy) {
-      if (typeof options.proxy === 'string') {
-        proxy = _url2['default'].parse(options.proxy);
-        options.proxy = {};
-        options.proxy.protocol = cleanProtocol(proxy.protocol);
-        options.proxy.host = proxy.hostname;
-        options.proxy.port = proxy.port;
-        options.proxy.proxyAuth = proxy.auth;
-        options.proxy.headers = { 'User-Agent': 'Node' };
-      }
+  if (options.proxy) {
+    if (typeof options.proxy === 'string') {
+      var proxy = _url2['default'].parse(options.proxy);
+      options.proxy = {};
+      options.proxy.protocol = cleanProtocol(proxy.protocol);
+      options.proxy.host = proxy.hostname;
+      options.proxy.port = proxy.port;
+      options.proxy.proxyAuth = proxy.auth;
+      options.proxy.headers = { 'User-Agent': 'Node' };
     }
-
-    options.gunzip = options.gunzip || false;
-    return options;
   }
+
+  options.gunzip = options.gunzip || false;
+  return options;
 }
 
 function cleanProtocol(str) {
