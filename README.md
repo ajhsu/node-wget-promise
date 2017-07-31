@@ -14,7 +14,9 @@ node-wget-promise simplifies retrieving files from any URL, with Promise support
 npm install node-wget-promise --save
 ```
 
-## wget(src, output, options)
+## Example
+
+### Basic
 
 ```js
 var wget = require('node-wget-promise');
@@ -28,6 +30,23 @@ var options = {
 wget(src, options)
   .then(result => <Result>)
   .catch(err => <Error>);
+```
+
+### Simplfied
+
+```js
+var wget = require('node-wget-promise');
+wget('http://nodejs.org/images/logo.svg');
+```
+
+### with Async-Await
+
+```js
+var wget = require('node-wget-promise');
+(async () => {
+  await wget('http://nodejs.org/images/logo.svg');
+  console.log('Done');
+})();
 ```
 
 ## options
