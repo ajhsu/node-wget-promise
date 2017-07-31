@@ -42,6 +42,7 @@ var _fs2 = _interopRequireDefault(_fs);
  */
 function download(source, options) {
   return new Promise(function (y, n) {
+    options = options || {};
     if (typeof options.gunzip === 'undefined') {
       options.gunzip = false;
     }

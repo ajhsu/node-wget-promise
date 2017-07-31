@@ -14,6 +14,7 @@ import fs from 'fs';
  */
 function download(source, options) {
   return new Promise((y, n) => {
+    options = options || {};
     if (typeof options.gunzip === 'undefined') {
       options.gunzip = false;
     }
