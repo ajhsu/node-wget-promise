@@ -40,14 +40,15 @@ var _fs2 = _interopRequireDefault(_fs);
  * @param {object} options - Options object
  * @returns {Promise}
  */
-function download(source, options) {
+function download(source) {
+  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
   return new Promise(function (y, n) {
-    options = options || {};
     if (typeof options.gunzip === 'undefined') {
       options.gunzip = false;
     }
     if (typeof options.output === 'undefined') {
-      options.output = _path2['default'].basename(_url2['default'].parse(source).pathname);
+      options.output = _path2['default'].basename(_url2['default'].parse(source).pathname) || 'unknown';
     }
     if (options.proxy) {
       if (typeof options.proxy === 'string') {

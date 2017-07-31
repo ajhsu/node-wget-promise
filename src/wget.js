@@ -12,14 +12,13 @@ import fs from 'fs';
  * @param {object} options - Options object
  * @returns {Promise}
  */
-function download(source, options) {
+function download(source, options = {}) {
   return new Promise((y, n) => {
-    options = options || {};
     if (typeof options.gunzip === 'undefined') {
       options.gunzip = false;
     }
     if (typeof options.output === 'undefined') {
-      options.output = path.basename(url.parse(source).pathname);
+      options.output = path.basename(url.parse(source).pathname) || 'unknown';
     }
     if (options.proxy) {
       if (typeof options.proxy === 'string') {
@@ -46,7 +45,7 @@ function download(source, options) {
         auth: options.auth ? options.auth : undefined,
         method: 'GET'
       },
-      function(res) {
+      res => {
         if (res.statusCode === 200) {
           var gunzip = zlib.createGunzip();
           var fileSize = parseInt(res.headers['content-length']);
@@ -59,7 +58,7 @@ function download(source, options) {
             encoding: 'binary'
           });
 
-          res.on('error', function(err) {
+          res.on('error', err => {
             writeStream.end();
             n(err);
           });
@@ -81,18 +80,18 @@ function download(source, options) {
           }
 
           // Data handlers
-          res.on('data', function(chunk) {
+          res.on('data', chunk => {
             downloadedSize += chunk.length;
             if (options.onProgress) {
               let progress = downloadedSize / fileSize;
               options.onProgress(progress);
             }
           });
-          gunzip.on('data', function(chunk) {
+          gunzip.on('data', chunk => {
             writeStream.write(chunk);
           });
 
-          writeStream.on('finish', function() {
+          writeStream.on('finish', () => {
             writeStream.end();
             req.end('finished');
             y({ headers: res.headers, fileSize });

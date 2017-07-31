@@ -5,7 +5,7 @@ const wget = require('../build/wget');
 const expect = require('chai').expect;
 
 describe('Download Tests', function() {
-  this.timeout(30 * 1000);
+  this.timeout(15 * 1000);
 
   it('Should download the NPM logo', function(done) {
     const Bytes = 1024;
@@ -35,9 +35,41 @@ describe('Download Tests', function() {
         expect(err).to.be.null;
       });
   });
+
   it('Should download file even options is not given', function(done) {
     const fileName = 'open-graph.png';
     wget('https://www.npmjs.com/static/images/touch-icons/open-graph.png')
+      .then(result => {
+        // Check if file existed
+        expect(fs.existsSync(fileName)).to.be.true;
+        // Delete download file
+        fs.unlinkSync(fileName);
+        done();
+      })
+      .catch(err => {
+        console.log(err);
+        expect(err).to.be.null;
+      });
+  });
+  it('Should download file with gzip response header', function(done) {
+    const fileName = 'index.html';
+    wget('https://www.apple.com/index.html')
+      .then(result => {
+        // Check if file existed
+        expect(fs.existsSync(fileName)).to.be.true;
+        // Delete download file
+        fs.unlinkSync(fileName);
+        done();
+      })
+      .catch(err => {
+        console.log(err);
+        expect(err).to.be.null;
+      });
+  });
+    
+  it('Should download with unknown file name', function(done) {
+    const fileName = 'unknown';
+    wget('https://www.apple.com/')
       .then(result => {
         // Check if file existed
         expect(fs.existsSync(fileName)).to.be.true;
