@@ -48,7 +48,9 @@ function download(source, options = {}) {
       res => {
         if (res.statusCode === 200) {
           var gunzip = zlib.createGunzip();
-          var fileSize = parseInt(res.headers['content-length']);
+          var fileSize = Number.isInteger(res.headers['content-length'] - 0)
+            ? parseInt(res.headers['content-length'])
+            : 0;
           var downloadedSize = 0;
           var encoding = '';
 
@@ -83,8 +85,11 @@ function download(source, options = {}) {
           res.on('data', chunk => {
             downloadedSize += chunk.length;
             if (options.onProgress) {
-              let progress = downloadedSize / fileSize;
-              options.onProgress(progress);
+              options.onProgress({
+                fileSize,
+                downloadedSize,
+                percentage: fileSize > 0 ? downloadedSize / fileSize : 0
+              });
             }
           });
           gunzip.on('data', chunk => {
@@ -186,7 +191,10 @@ function parseRequestOptions(options) {
 }
 
 function cleanProtocol(str) {
-  return str.trim().toLowerCase().replace(/:$/, '');
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/:$/, '');
 }
 
 export default download;

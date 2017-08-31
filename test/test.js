@@ -51,6 +51,7 @@ describe('Download Tests', function() {
         expect(err).to.be.null;
       });
   });
+
   it('Should download file with gzip response header', function(done) {
     const fileName = 'index.html';
     wget('https://www.apple.com/index.html')
@@ -66,7 +67,7 @@ describe('Download Tests', function() {
         expect(err).to.be.null;
       });
   });
-    
+
   it('Should download with unknown file name', function(done) {
     const fileName = 'unknown';
     wget('https://www.apple.com/')

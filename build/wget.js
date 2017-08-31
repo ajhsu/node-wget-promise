@@ -76,7 +76,7 @@ function download(source) {
     }, function (res) {
       if (res.statusCode === 200) {
         var gunzip = _zlib2['default'].createGunzip();
-        var fileSize = parseInt(res.headers['content-length']);
+        var fileSize = Number.isInteger(res.headers['content-length'] - 0) ? parseInt(res.headers['content-length']) : 0;
         var downloadedSize = 0;
         var encoding = '';
 
@@ -111,8 +111,11 @@ function download(source) {
         res.on('data', function (chunk) {
           downloadedSize += chunk.length;
           if (options.onProgress) {
-            var progress = downloadedSize / fileSize;
-            options.onProgress(progress);
+            options.onProgress({
+              fileSize: fileSize,
+              downloadedSize: downloadedSize,
+              percentage: fileSize > 0 ? downloadedSize / fileSize : 0
+            });
           }
         });
         gunzip.on('data', function (chunk) {
