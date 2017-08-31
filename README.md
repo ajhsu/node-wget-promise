@@ -49,21 +49,16 @@ var wget = require('node-wget-promise');
 })();
 ```
 
-## options
-
-```js
-
-options = {}
-// Set to true to have any gzip stream automatically decompressed before saving
-options.gunzip = false;
-options.proxy = {};
-options.proxy.protocol = 'http';
-options.proxy.host = 'someproxy.org';
-options.proxy.port = 1337;
-options.proxy.proxyAuth = '{basic auth}';
-options.proxy.headers = {'User-Agent': 'Node'};
-```
-
 ## Todo
 
-- Enable gzip when using request method
+### Testing
+* Write unit-tests for various of download tasks
+
+### Multi-tasking
+* Response with a downloader instance that may access to each of downloads.
+
+### Large-file downloading
+* Testing with large-files. Make sure it works as expected.
+
+### Uncategorized
+* Enable gzip when using request method
