@@ -6,7 +6,7 @@ import path from 'path';
 import zlib from 'zlib';
 import fs from 'fs';
 
-// Turn something like `http://abcde` into `http`
+// Clean up something like `http:` into `http`
 export const cleanProtocol = str => {
   return str
     .trim()

@@ -1,8 +1,6 @@
-'use strict';
-
-const fs = require('fs');
-const wget = require('./index');
-const expect = require('chai').expect;
+import { expect } from 'chai';
+import fs from 'fs';
+import wget from './index';
 
 describe('Download Tests', function() {
   this.timeout(15 * 1000);
@@ -10,15 +8,18 @@ describe('Download Tests', function() {
   it('Should download the Nodejs logo', function(done) {
     const Bytes = 1024;
     const fileName = 'nodejs-logo.png';
-    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png', {
-      onStart: headers => {
-        expect(headers['content-type']).to.be.eqls('image/png');
-      },
-      onProgress: progress => {
-        console.log('downloaded', progress, '%');
-      },
-      output: fileName
-    })
+    wget(
+      'https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png',
+      {
+        onStart: headers => {
+          expect(headers['content-type']).to.be.eqls('image/png');
+        },
+        onProgress: progress => {
+          console.log('downloaded', progress, '%');
+        },
+        output: fileName
+      }
+    )
       .then(result => {
         expect(result.headers['content-type']).to.be.eqls('image/png');
         expect(result.fileSize).to.be.a('number');
@@ -38,7 +39,9 @@ describe('Download Tests', function() {
 
   it('Should download file even options is not given', function(done) {
     const fileName = 'nodejs-logo.png';
-    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png')
+    wget(
+      'https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png'
+    )
       .then(result => {
         // Check if file existed
         expect(fs.existsSync(fileName)).to.be.true;

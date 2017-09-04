@@ -34,7 +34,7 @@ var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
 
-// Turn something like `http://abcde` into `http`
+// Clean up something like `http:` into `http`
 var cleanProtocol = function cleanProtocol(str) {
   return str.trim().toLowerCase().replace(/:$/, '');
 };
