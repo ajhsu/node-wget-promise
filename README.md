@@ -22,14 +22,13 @@ npm install node-wget-promise --save
 var wget = require('node-wget-promise');
 var src = 'http://nodejs.org/images/logo.svg';
 var options = {
-  onStart: <Callback>,
-  onProgress: <Callback>,
-  output: <outputFilePath>
-  // see options below
+  onStart: [Callback],
+  onProgress: [Callback],
+  output: [outputFilePath]
 };
 wget(src, options)
-  .then(result => <Result>)
-  .catch(err => <Error>);
+  .then(result => [Result])
+  .catch(err => [Error]);
 ```
 
 ### Simplfied
@@ -48,17 +47,3 @@ var wget = require('node-wget-promise');
   console.log('Done');
 })();
 ```
-
-## Todo
-
-### Testing
-* Write unit-tests for various of download tasks
-
-### Multi-tasking
-* Response with a downloader instance that may access to each of downloads.
-
-### Large-file downloading
-* Testing with large-files. Make sure it works as expected.
-
-### Uncategorized
-* Enable gzip when using request method
