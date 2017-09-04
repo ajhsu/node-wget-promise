@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import fs from 'fs';
 import wget from './index';
 
-describe('Download Tests', function() {
+describe('Integration tests', function() {
   this.timeout(15 * 1000);
 
   it('Should download the file with HTTP protocol', function(done) {
