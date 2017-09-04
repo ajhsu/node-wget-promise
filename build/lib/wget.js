@@ -34,13 +34,95 @@ var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
 
+// Turn something like `http://abcde` into `http`
+var cleanProtocol = function cleanProtocol(str) {
+  return str.trim().toLowerCase().replace(/:$/, '');
+};
+
+exports.cleanProtocol = cleanProtocol;
+var parseRequestOptions = function parseRequestOptions(options) {
+  if (!options.protocol) {
+    options.protocol = 'http';
+  }
+  options.protocol = cleanProtocol(options.protocol);
+
+  if (options.proxy) {
+    if (typeof options.proxy === 'string') {
+      var proxy = _url2['default'].parse(options.proxy);
+      options.proxy = {};
+      options.proxy.protocol = cleanProtocol(proxy.protocol);
+      options.proxy.host = proxy.hostname;
+      options.proxy.port = proxy.port;
+      options.proxy.proxyAuth = proxy.auth;
+      options.proxy.headers = { 'User-Agent': 'Node' };
+    }
+  }
+
+  options.gunzip = options.gunzip || false;
+  return options;
+};
+
+exports.parseRequestOptions = parseRequestOptions;
+var request = function request(options, callback) {
+  var newOptions = {},
+      newProxy = {},
+      key;
+  options = parseRequestOptions(options);
+  if (options.protocol === 'http') {
+    if (options.proxy) {
+      for (key in options.proxy) {
+        if (key !== 'protocol') {
+          newProxy[key] = options.proxy[key];
+        }
+      }
+      if (options.proxy.protocol === 'http') {
+        options.agent = _tunnel2['default'].httpOverHttp({ proxy: newProxy });
+      } else if (options.proxy.protocol === 'https') {
+        options.agent = _tunnel2['default'].httpOverHttps({ proxy: newProxy });
+      } else {
+        throw options.proxy.protocol + ' proxy is not supported!';
+      }
+    }
+    for (key in options) {
+      if (key !== 'protocol' && key !== 'proxy') {
+        newOptions[key] = options[key];
+      }
+    }
+    return _http2['default'].request(newOptions, callback);
+  }
+  if (options.protocol === 'https') {
+    if (options.proxy) {
+      for (key in options.proxy) {
+        if (key !== 'protocol') {
+          newProxy[key] = options.proxy[key];
+        }
+      }
+      if (options.proxy.protocol === 'http') {
+        options.agent = _tunnel2['default'].httpsOverHttp({ proxy: newProxy });
+      } else if (options.proxy.protocol === 'https') {
+        options.agent = _tunnel2['default'].httpsOverHttps({ proxy: newProxy });
+      } else {
+        throw options.proxy.protocol + ' proxy is not supported!';
+      }
+    }
+    for (key in options) {
+      if (key !== 'protocol' && key !== 'proxy') {
+        newOptions[key] = options[key];
+      }
+    }
+    return _https2['default'].request(newOptions, callback);
+  }
+  throw 'only allow http or https request!';
+};
+
+exports.request = request;
 /**
  * Downloads a file using http get and request
  * @param {string} source - The http URL to download from
  * @param {object} options - Options object
  * @returns {Promise}
  */
-function download(source) {
+var download = function download(source) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   return new Promise(function (y, n) {
@@ -137,85 +219,5 @@ function download(source) {
       return n(err);
     });
   });
-}
-
-function request(options, callback) {
-  var newOptions = {},
-      newProxy = {},
-      key;
-  options = parseRequestOptions(options);
-  if (options.protocol === 'http') {
-    if (options.proxy) {
-      for (key in options.proxy) {
-        if (key !== 'protocol') {
-          newProxy[key] = options.proxy[key];
-        }
-      }
-      if (options.proxy.protocol === 'http') {
-        options.agent = _tunnel2['default'].httpOverHttp({ proxy: newProxy });
-      } else if (options.proxy.protocol === 'https') {
-        options.agent = _tunnel2['default'].httpOverHttps({ proxy: newProxy });
-      } else {
-        throw options.proxy.protocol + ' proxy is not supported!';
-      }
-    }
-    for (key in options) {
-      if (key !== 'protocol' && key !== 'proxy') {
-        newOptions[key] = options[key];
-      }
-    }
-    return _http2['default'].request(newOptions, callback);
-  }
-  if (options.protocol === 'https') {
-    if (options.proxy) {
-      for (key in options.proxy) {
-        if (key !== 'protocol') {
-          newProxy[key] = options.proxy[key];
-        }
-      }
-      if (options.proxy.protocol === 'http') {
-        options.agent = _tunnel2['default'].httpsOverHttp({ proxy: newProxy });
-      } else if (options.proxy.protocol === 'https') {
-        options.agent = _tunnel2['default'].httpsOverHttps({ proxy: newProxy });
-      } else {
-        throw options.proxy.protocol + ' proxy is not supported!';
-      }
-    }
-    for (key in options) {
-      if (key !== 'protocol' && key !== 'proxy') {
-        newOptions[key] = options[key];
-      }
-    }
-    return _https2['default'].request(newOptions, callback);
-  }
-  throw 'only allow http or https request!';
-}
-
-function parseRequestOptions(options) {
-  if (!options.protocol) {
-    options.protocol = 'http';
-  }
-  options.protocol = cleanProtocol(options.protocol);
-
-  if (options.proxy) {
-    if (typeof options.proxy === 'string') {
-      var proxy = _url2['default'].parse(options.proxy);
-      options.proxy = {};
-      options.proxy.protocol = cleanProtocol(proxy.protocol);
-      options.proxy.host = proxy.hostname;
-      options.proxy.port = proxy.port;
-      options.proxy.proxyAuth = proxy.auth;
-      options.proxy.headers = { 'User-Agent': 'Node' };
-    }
-  }
-
-  options.gunzip = options.gunzip || false;
-  return options;
-}
-
-function cleanProtocol(str) {
-  return str.trim().toLowerCase().replace(/:$/, '');
-}
-
-exports['default'] = download;
-module.exports = exports['default'];
+};
+exports.download = download;

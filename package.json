@@ -4,7 +4,7 @@
   "description": "wget in Node with Promise support, forked from bearjaws/node-wget",
   "author": "AJ Hsu <im.ajhsu@gmail.com>",
   "license": "MIT",
-  "main": "index.js",
+  "main": "build/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ajhsu/node-wget-promise.git"
@@ -24,6 +24,6 @@
   "scripts": {
     "build": "./node_modules/.bin/babel src -d build",
     "pretest": "npm run build",
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha \"build/**/*.test.js\""
   }
 }

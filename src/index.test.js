@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const wget = require('../build/wget');
+const wget = require('./index');
 const expect = require('chai').expect;
 
 describe('Download Tests', function() {
