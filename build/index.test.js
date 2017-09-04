@@ -10,7 +10,7 @@ describe('Download Tests', function () {
   it('Should download the Nodejs logo', function (done) {
     var Bytes = 1024;
     var fileName = 'nodejs-logo.png';
-    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/test/nodejs-logo.png', {
+    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png', {
       onStart: function onStart(headers) {
         expect(headers['content-type']).to.be.eqls('image/png');
       },
@@ -36,7 +36,7 @@ describe('Download Tests', function () {
 
   it('Should download file even options is not given', function (done) {
     var fileName = 'nodejs-logo.png';
-    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/test/nodejs-logo.png').then(function (result) {
+    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png').then(function (result) {
       // Check if file existed
       expect(fs.existsSync(fileName)).to.be['true'];
       // Delete download file
