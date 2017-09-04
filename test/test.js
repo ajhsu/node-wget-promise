@@ -7,10 +7,10 @@ const expect = require('chai').expect;
 describe('Download Tests', function() {
   this.timeout(15 * 1000);
 
-  it('Should download the NPM logo', function(done) {
+  it('Should download the Nodejs logo', function(done) {
     const Bytes = 1024;
-    const fileName = 'open-graph.png';
-    wget('https://www.npmjs.com/static/images/touch-icons/open-graph.png', {
+    const fileName = 'nodejs-logo.png';
+    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/test/nodejs-logo.png', {
       onStart: headers => {
         expect(headers['content-type']).to.be.eqls('image/png');
       },
@@ -37,8 +37,8 @@ describe('Download Tests', function() {
   });
 
   it('Should download file even options is not given', function(done) {
-    const fileName = 'open-graph.png';
-    wget('https://www.npmjs.com/static/images/touch-icons/open-graph.png')
+    const fileName = 'nodejs-logo.png';
+    wget('https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/test/nodejs-logo.png')
       .then(result => {
         // Check if file existed
         expect(fs.existsSync(fileName)).to.be.true;
