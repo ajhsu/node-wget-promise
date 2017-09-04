@@ -5,7 +5,36 @@ import wget from './index';
 describe('Download Tests', function() {
   this.timeout(15 * 1000);
 
-  it('Should download the Nodejs logo', function(done) {
+  it('Should download the file with HTTP protocol', function(done) {
+    const Bytes = 1024;
+    const fileName = 'logo.svg';
+    wget('http://www.president.gov.tw/images/logo.svg', {
+      onStart: headers => {
+        expect(headers['content-type']).to.be.eqls('image/svg+xml');
+      },
+      onProgress: progress => {
+        console.log('downloaded', progress, '%');
+      },
+      output: fileName
+    })
+      .then(result => {
+        expect(result.headers['content-type']).to.be.eqls('image/svg+xml');
+        expect(result.fileSize).to.be.a('number');
+        expect(result.fileSize).to.be.above(0 * Bytes);
+        expect(result.fileSize).to.be.below(100 * Bytes);
+        // Check if file existed
+        expect(fs.existsSync(fileName)).to.be.true;
+        // Delete download file
+        fs.unlinkSync(fileName);
+        done();
+      })
+      .catch(err => {
+        console.log(err);
+        expect(err).to.be.null;
+      });
+  });
+
+  it('Should download the file with HTTPS protocol', function(done) {
     const Bytes = 1024;
     const fileName = 'nodejs-logo.png';
     wget(

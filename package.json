@@ -13,9 +13,7 @@
     "url": "https://github.com/ajhsu/node-wget-promise/issues"
   },
   "homepage": "https://github.com/ajhsu/node-wget-promise#readme",
-  "dependencies": {
-    "tunnel": "0.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel": "^5.8.38",
     "chai": "^4.0.2",
