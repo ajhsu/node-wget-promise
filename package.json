@@ -1,6 +1,6 @@
 {
   "name": "node-wget-promise",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description":
     "wget in Node, with Promise support",
   "author": "AJ Hsu <im.ajhsu@gmail.com>",
