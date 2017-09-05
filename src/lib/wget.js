@@ -2,7 +2,6 @@ import http from 'http';
 import https from 'https';
 import url from 'url';
 import path from 'path';
-import zlib from 'zlib';
 import fs from 'fs';
 
 /**
@@ -11,17 +10,16 @@ import fs from 'fs';
  * @param {object} options - Options object
  * @returns {Promise}
  */
-export const download = (source, options = {}) => {
+export const download = (source, { output, onStart, onProgress } = {}) => {
   return new Promise((y, n) => {
-    if (typeof options.gunzip === 'undefined') {
-      options.gunzip = false;
-    }
-    if (typeof options.output === 'undefined') {
-      options.output = path.basename(url.parse(source).pathname) || 'unknown';
+    if (typeof output === 'undefined') {
+      output = path.basename(url.parse(source).pathname) || 'unknown';
     }
 
+    // Parse the source url into parts
     const sourceUrl = url.parse(source);
 
+    // Determine to use https or http request depends on source url
     let request = null;
     if (sourceUrl.protocol === 'https:') {
       request = https.request;
@@ -31,6 +29,7 @@ export const download = (source, options = {}) => {
       throw new Error('protocol should be http or https');
     }
 
+    // Issue the request
     const req = request(
       {
         method: 'GET',
@@ -40,18 +39,36 @@ export const download = (source, options = {}) => {
         path: sourceUrl.pathname + (sourceUrl.search || '')
       },
       res => {
+        // Once the request got responsed
         if (res.statusCode === 200) {
-          var gunzip = zlib.createGunzip();
-          var fileSize = Number.isInteger(res.headers['content-length'] - 0)
+          const fileSize = Number.isInteger(res.headers['content-length'] - 0)
             ? parseInt(res.headers['content-length'])
             : 0;
-          var downloadedSize = 0;
-          var encoding = '';
+          let downloadedSize = 0;
 
           // Create write stream
-          var writeStream = fs.createWriteStream(options.output, {
+          var writeStream = fs.createWriteStream(output, {
             flags: 'w+',
             encoding: 'binary'
+          });
+
+          res.pipe(writeStream);
+
+          // onStartCallback
+          if (onStart) {
+            onStart(res.headers);
+          }
+
+          // Data handlers
+          res.on('data', chunk => {
+            downloadedSize += chunk.length;
+            if (onProgress) {
+              onProgress({
+                fileSize,
+                downloadedSize,
+                percentage: fileSize > 0 ? downloadedSize / fileSize : 0
+              });
+            }
           });
 
           res.on('error', err => {
@@ -59,47 +76,12 @@ export const download = (source, options = {}) => {
             n(err);
           });
 
-          if (typeof res.headers['content-encoding'] === 'string') {
-            encoding = res.headers['content-encoding'];
-          }
-
-          // If the user has specified to unzip, and the file is gzip encoded, pipe to gunzip
-          if (options.gunzip === true && encoding === 'gzip') {
-            res.pipe(gunzip);
-          } else {
-            res.pipe(writeStream);
-          }
-
-          // onStartCallback
-          if (options.onStart) {
-            options.onStart(res.headers);
-          }
-
-          // Data handlers
-          res.on('data', chunk => {
-            downloadedSize += chunk.length;
-            if (options.onProgress) {
-              options.onProgress({
-                fileSize,
-                downloadedSize,
-                percentage: fileSize > 0 ? downloadedSize / fileSize : 0
-              });
-            }
-          });
-          gunzip.on('data', chunk => {
-            writeStream.write(chunk);
-          });
-
           writeStream.on('finish', () => {
             writeStream.end();
             req.end('finished');
             y({ headers: res.headers, fileSize });
           });
-        } else if (
-          res.statusCode !== 200 &&
-          res.statusCode !== 301 &&
-          res.statusCode !== 302
-        ) {
+        } else {
           n('Server responded with unhandled status: ' + res.statusCode);
         }
       }
