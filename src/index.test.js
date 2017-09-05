@@ -5,12 +5,12 @@ import wget from './index';
 describe('Integration tests', function() {
   this.timeout(15 * 1000);
 
-  it('Should download the file with HTTP protocol', function(done) {
+  it('should download the file with HTTP protocol', function(done) {
     const Bytes = 1024;
     const fileName = 'logo.svg';
     wget('http://www.president.gov.tw/images/logo.svg', {
       onStart: headers => {
-        expect(headers['content-type']).to.be.eqls('image/svg+xml');
+        expect(headers['content-type']).to.be.contains('image/svg+xml');
       },
       onProgress: progress => {
         console.log('downloaded', progress, '%');
@@ -18,7 +18,7 @@ describe('Integration tests', function() {
       output: fileName
     })
       .then(result => {
-        expect(result.headers['content-type']).to.be.eqls('image/svg+xml');
+        expect(result.headers['content-type']).to.be.contains('image/svg+xml');
         expect(result.fileSize).to.be.a('number');
         expect(result.fileSize).to.be.above(0 * Bytes);
         expect(result.fileSize).to.be.below(100 * Bytes);
@@ -34,14 +34,14 @@ describe('Integration tests', function() {
       });
   });
 
-  it('Should download the file with HTTPS protocol', function(done) {
+  it('should download the file with HTTPS protocol', function(done) {
     const Bytes = 1024;
-    const fileName = 'nodejs-logo.png';
+    const fileName = '__nodejs-logo.png';
     wget(
       'https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png',
       {
         onStart: headers => {
-          expect(headers['content-type']).to.be.eqls('image/png');
+          expect(headers['content-type']).to.be.contains('image/png');
         },
         onProgress: progress => {
           console.log('downloaded', progress, '%');
@@ -50,7 +50,7 @@ describe('Integration tests', function() {
       }
     )
       .then(result => {
-        expect(result.headers['content-type']).to.be.eqls('image/png');
+        expect(result.headers['content-type']).to.be.contains('image/png');
         expect(result.fileSize).to.be.a('number');
         expect(result.fileSize).to.be.above(0 * Bytes);
         expect(result.fileSize).to.be.below(50 * Bytes);
@@ -66,7 +66,7 @@ describe('Integration tests', function() {
       });
   });
 
-  it('Should download file even options is not given', function(done) {
+  it('should download file even options is not given', function(done) {
     const fileName = 'nodejs-logo.png';
     wget(
       'https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png'
@@ -84,23 +84,7 @@ describe('Integration tests', function() {
       });
   });
 
-  it('Should download file with gzip response header', function(done) {
-    const fileName = 'index.html';
-    wget('https://www.apple.com/index.html')
-      .then(result => {
-        // Check if file existed
-        expect(fs.existsSync(fileName)).to.be.true;
-        // Delete download file
-        fs.unlinkSync(fileName);
-        done();
-      })
-      .catch(err => {
-        console.log(err);
-        expect(err).to.be.null;
-      });
-  });
-
-  it('Should download with unknown file name', function(done) {
+  it('should download with unknown file name', function(done) {
     const fileName = 'unknown';
     wget('https://www.apple.com/')
       .then(result => {
