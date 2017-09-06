@@ -10,7 +10,10 @@ import fs from 'fs';
  * @param {object} options - Options object
  * @returns {Promise}
  */
-export const download = (source, { output, onStart, onProgress } = {}) => {
+export const download = (
+  source,
+  { verbose, output, onStart, onProgress } = {}
+) => {
   return new Promise((y, n) => {
     if (typeof output === 'undefined') {
       output = path.basename(url.parse(source).pathname) || 'unknown';
@@ -81,6 +84,25 @@ export const download = (source, { output, onStart, onProgress } = {}) => {
             req.end('finished');
             y({ headers: res.headers, fileSize });
           });
+        } else if (
+          res.statusCode === 301 ||
+          res.statusCode === 302 ||
+          res.statusCode === 307
+        ) {
+          const redirectLocation = res.headers.location;
+          
+          if (verbose) {
+            console.log('node-wget-promise: Redirected to:', redirectLocation);
+          }
+
+          // Call download function recursively
+          download(redirectLocation, {
+            output,
+            onStart,
+            onProgress
+          })
+            .then(y)
+            .catch(n);
         } else {
           n('Server responded with unhandled status: ' + res.statusCode);
         }

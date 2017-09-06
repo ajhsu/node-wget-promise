@@ -35,6 +35,7 @@ var _fs2 = _interopRequireDefault(_fs);
 var download = function download(source) {
   var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
+  var verbose = _ref.verbose;
   var output = _ref.output;
   var onStart = _ref.onStart;
   var onProgress = _ref.onProgress;
@@ -109,6 +110,19 @@ var download = function download(source) {
             y({ headers: res.headers, fileSize: fileSize });
           });
         })();
+      } else if (res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307) {
+        var redirectLocation = res.headers.location;
+
+        if (verbose) {
+          console.log('node-wget-promise: Redirected to:', redirectLocation);
+        }
+
+        // Call download function recursively
+        download(redirectLocation, {
+          output: output,
+          onStart: onStart,
+          onProgress: onProgress
+        }).then(y)['catch'](n);
       } else {
         n('Server responded with unhandled status: ' + res.statusCode);
       }

@@ -99,4 +99,33 @@ describe('Integration tests', function() {
         expect(err).to.be.null;
       });
   });
+
+  it('should download file via 301 redirection', function(done) {
+    const Bytes = 1024;
+    const fileName = 'index.html';
+    wget('http://www.kimo.com/index.html', {
+      onStart: headers => {
+        expect(headers['content-type']).to.be.contains('text/html');
+      },
+      onProgress: progress => {
+        console.log('downloaded', progress, '%');
+      },
+      output: fileName
+    })
+      .then(result => {
+        expect(result.headers['content-type']).to.be.contains('text/html');
+        expect(result.fileSize).to.be.a('number');
+        expect(result.fileSize).to.be.above(0 * Bytes);
+        expect(result.fileSize).to.be.below(1024 * Bytes);
+        // Check if file existed
+        expect(fs.existsSync(fileName)).to.be.true;
+        // Delete download file
+        fs.unlinkSync(fileName);
+        done();
+      })
+      .catch(err => {
+        console.log(err);
+        expect(err).to.be.null;
+      });
+  });
 });
