@@ -27,7 +27,7 @@ var options = {
   output: [outputFilePath]
 };
 wget(src, options)
-  .then(result => [Result])
+  .then(metadata => [fileMetadata])
   .catch(err => [Error]);
 ```
 
