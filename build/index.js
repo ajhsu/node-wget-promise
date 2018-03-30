@@ -6,5 +6,5 @@ Object.defineProperty(exports, '__esModule', {
 
 var _libWget = require('./lib/wget');
 
+exports.wget = _libWget.download;
 exports['default'] = _libWget.download;
-module.exports = exports['default'];
