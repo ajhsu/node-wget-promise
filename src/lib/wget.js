@@ -16,10 +16,14 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
       output = path.basename(url.parse(source).pathname) || 'unknown';
     }
 
-    // Parse the source url into parts
+    /**
+     * Parse the source url into parts
+     */
     const sourceUrl = url.parse(source);
 
-    // Determine to use https or http request depends on source url
+    /**
+     * Determine to use https or http request depends on source url
+     */
     let request = null;
     if (sourceUrl.protocol === 'https:') {
       request = https.request;
@@ -29,7 +33,9 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
       throw new Error('protocol should be http or https');
     }
 
-    // Issue the request
+    /**
+     * Issue the request
+     */
     const req = request(
       {
         method: 'GET',
@@ -39,15 +45,15 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
         path: sourceUrl.pathname + (sourceUrl.search || '')
       },
       res => {
-        // console.log(`HTTP ${res.statusCode} ${source}`);
-        // Once the request got responsed
         if (res.statusCode === 200) {
           const fileSize = Number.isInteger(res.headers['content-length'] - 0)
             ? parseInt(res.headers['content-length'])
             : 0;
           let downloadedSize = 0;
 
-          // Create write stream
+          /**
+           * Create write stream
+           */
           var writeStream = fs.createWriteStream(output, {
             flags: 'w+',
             encoding: 'binary'
@@ -55,12 +61,13 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
 
           res.pipe(writeStream);
 
-          // onStartCallback
+          /**
+           * Invoke `onStartCallback` function
+           */
           if (onStart) {
             onStart(res.headers);
           }
 
-          // Data handlers
           res.on('data', chunk => {
             downloadedSize += chunk.length;
             if (onProgress) {
@@ -93,7 +100,9 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
             console.log('node-wget-promise: Redirected to:', redirectLocation);
           }
 
-          // Call download function recursively
+          /**
+           * Call download function recursively
+           */
           download(redirectLocation, {
             output,
             onStart,
