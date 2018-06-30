@@ -1,2 +1,2 @@
-import { download } from './lib/wget';
-export default download;
+const wget = require('./lib/wget');
+module.exports = wget;

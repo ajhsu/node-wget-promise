@@ -1,8 +1,8 @@
-import http from 'http';
-import https from 'https';
-import url from 'url';
-import path from 'path';
-import fs from 'fs';
+const http = require('http');
+const https = require('https');
+const url = require('url');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * Downloads a file using http get and request
@@ -10,10 +10,7 @@ import fs from 'fs';
  * @param {object} options - Options object
  * @returns {Promise}
  */
-export const download = (
-  source,
-  { verbose, output, onStart, onProgress } = {}
-) => {
+const download = (source, { verbose, output, onStart, onProgress } = {}) => {
   return new Promise((y, n) => {
     if (typeof output === 'undefined') {
       output = path.basename(url.parse(source).pathname) || 'unknown';
@@ -42,6 +39,7 @@ export const download = (
         path: sourceUrl.pathname + (sourceUrl.search || '')
       },
       res => {
+        // console.log(`HTTP ${res.statusCode} ${source}`);
         // Once the request got responsed
         if (res.statusCode === 200) {
           const fileSize = Number.isInteger(res.headers['content-length'] - 0)
@@ -90,7 +88,7 @@ export const download = (
           res.statusCode === 307
         ) {
           const redirectLocation = res.headers.location;
-          
+
           if (verbose) {
             console.log('node-wget-promise: Redirected to:', redirectLocation);
           }
@@ -113,3 +111,5 @@ export const download = (
     req.on('error', err => n(err));
   });
 };
+
+module.exports = download;

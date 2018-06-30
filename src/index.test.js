@@ -1,16 +1,13 @@
-import { expect } from 'chai';
-import fs from 'fs';
-import wget from './index';
+const fs = require('fs');
+const wget = require('./index');
 
 describe('Integration tests', function() {
-  this.timeout(15 * 1000);
-
   it('should download the file with HTTP protocol', function(done) {
     const Bytes = 1024;
     const fileName = 'logo.svg';
     wget('http://www.president.gov.tw/images/logo.svg', {
       onStart: headers => {
-        expect(headers['content-type']).to.be.contains('image/svg+xml');
+        expect(headers['content-type']).toContain('image/svg+xml');
       },
       onProgress: progress => {
         console.log('downloaded', progress, '%');
@@ -18,19 +15,18 @@ describe('Integration tests', function() {
       output: fileName
     })
       .then(result => {
-        expect(result.headers['content-type']).to.be.contains('image/svg+xml');
-        expect(result.fileSize).to.be.a('number');
-        expect(result.fileSize).to.be.above(0 * Bytes);
-        expect(result.fileSize).to.be.below(100 * Bytes);
+        expect(result.headers['content-type']).toContain('image/svg+xml');
+        expect(result.fileSize).toBeGreaterThan(0 * Bytes);
+        expect(result.fileSize).toBeLessThan(100 * Bytes);
         // Check if file existed
-        expect(fs.existsSync(fileName)).to.be.true;
+        expect(fs.existsSync(fileName)).toBeTruthy();
         // Delete download file
         fs.unlinkSync(fileName);
         done();
       })
       .catch(err => {
         console.log(err);
-        expect(err).to.be.null;
+        expect(err).toBeNull();
       });
   });
 
@@ -41,7 +37,7 @@ describe('Integration tests', function() {
       'https://raw.githubusercontent.com/ajhsu/node-wget-promise/master/assets/nodejs-logo.png',
       {
         onStart: headers => {
-          expect(headers['content-type']).to.be.contains('image/png');
+          expect(headers['content-type']).toContain('image/png');
         },
         onProgress: progress => {
           console.log('downloaded', progress, '%');
@@ -50,19 +46,18 @@ describe('Integration tests', function() {
       }
     )
       .then(result => {
-        expect(result.headers['content-type']).to.be.contains('image/png');
-        expect(result.fileSize).to.be.a('number');
-        expect(result.fileSize).to.be.above(0 * Bytes);
-        expect(result.fileSize).to.be.below(50 * Bytes);
+        expect(result.headers['content-type']).toContain('image/png');
+        expect(result.fileSize).toBeGreaterThan(0 * Bytes);
+        expect(result.fileSize).toBeLessThan(50 * Bytes);
         // Check if file existed
-        expect(fs.existsSync(fileName)).to.be.true;
+        expect(fs.existsSync(fileName)).toBeTruthy();
         // Delete download file
         fs.unlinkSync(fileName);
         done();
       })
       .catch(err => {
         console.log(err);
-        expect(err).to.be.null;
+        expect(err).toBeNull();
       });
   });
 
@@ -73,14 +68,14 @@ describe('Integration tests', function() {
     )
       .then(result => {
         // Check if file existed
-        expect(fs.existsSync(fileName)).to.be.true;
+        expect(fs.existsSync(fileName)).toBeTruthy();
         // Delete download file
         fs.unlinkSync(fileName);
         done();
       })
       .catch(err => {
         console.log(err);
-        expect(err).to.be.null;
+        expect(err).toBeNull();
       });
   });
 
@@ -89,14 +84,41 @@ describe('Integration tests', function() {
     wget('https://www.apple.com/')
       .then(result => {
         // Check if file existed
-        expect(fs.existsSync(fileName)).to.be.true;
+        expect(fs.existsSync(fileName)).toBeTruthy();
         // Delete download file
         fs.unlinkSync(fileName);
         done();
       })
       .catch(err => {
         console.log(err);
-        expect(err).to.be.null;
+        expect(err).toBeNull();
+      });
+  });
+
+  it.skip('should download large file size in ~100MB', function(done) {
+    const fileName = 'large_file.jpg';
+    wget(
+      'https://upload.wikimedia.org/wikipedia/commons/6/6e/1_lijiang_old_town_2012.jpg',
+      {
+        onStart: headers => {
+          expect(headers['content-type']).toContain('image/jpeg');
+        },
+        onProgress: progress => {
+          console.log('downloaded', progress, '%');
+        },
+        output: fileName
+      }
+    )
+      .then(result => {
+        // Check if file existed
+        expect(fs.existsSync(fileName)).toBeTruthy();
+        // Delete download file
+        fs.unlinkSync(fileName);
+        done();
+      })
+      .catch(err => {
+        console.log(err);
+        expect(err).toBeNull();
       });
   });
 
@@ -105,7 +127,7 @@ describe('Integration tests', function() {
     const fileName = 'index.html';
     wget('http://www.kimo.com/index.html', {
       onStart: headers => {
-        expect(headers['content-type']).to.be.contains('text/html');
+        expect(headers['content-type']).toContain('text/html');
       },
       onProgress: progress => {
         console.log('downloaded', progress, '%');
@@ -113,19 +135,18 @@ describe('Integration tests', function() {
       output: fileName
     })
       .then(result => {
-        expect(result.headers['content-type']).to.be.contains('text/html');
-        expect(result.fileSize).to.be.a('number');
-        expect(result.fileSize).to.be.above(0 * Bytes);
-        expect(result.fileSize).to.be.below(1024 * Bytes);
+        expect(result.headers['content-type']).toContain('text/html');
+        expect(result.fileSize).toBeGreaterThan(0 * Bytes);
+        expect(result.fileSize).toBeLessThan(1024 * Bytes);
         // Check if file existed
-        expect(fs.existsSync(fileName)).to.be.true;
+        expect(fs.existsSync(fileName)).toBeTruthy();
         // Delete download file
         fs.unlinkSync(fileName);
         done();
       })
       .catch(err => {
         console.log(err);
-        expect(err).to.be.null;
+        expect(err).toBeNull();
       });
   });
 });

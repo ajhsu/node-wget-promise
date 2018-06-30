@@ -2,27 +2,29 @@
   "name": "node-wget-promise",
   "version": "0.1.4",
   "description": "wget in Node, with Promise support",
-  "keywords": ["wget", "download", "http", "request", "promise"],
-  "author": "AJ Hsu <im.ajhsu@gmail.com>",
-  "license": "MIT",
-  "main": "build/index.js",
+  "keywords": [
+    "download",
+    "http",
+    "promise",
+    "request",
+    "wget"
+  ],
+  "homepage": "https://github.com/ajhsu/node-wget-promise#readme",
+  "bugs": {
+    "url": "https://github.com/ajhsu/node-wget-promise/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ajhsu/node-wget-promise.git"
   },
-  "bugs": {
-    "url": "https://github.com/ajhsu/node-wget-promise/issues"
+  "license": "MIT",
+  "author": "AJ Hsu <im.ajhsu@gmail.com>",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
   },
-  "homepage": "https://github.com/ajhsu/node-wget-promise#readme",
   "dependencies": {},
   "devDependencies": {
-    "babel": "^5.8.38",
-    "chai": "^4.0.2",
-    "mocha": "^3.4.2"
-  },
-  "scripts": {
-    "build": "./node_modules/.bin/babel src -d build",
-    "pretest": "npm run build",
-    "test": "./node_modules/.bin/mocha \"build/**/*.test.js\""
+    "jest": "^23.2.0"
   }
 }
