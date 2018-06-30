@@ -1,6 +1,6 @@
 # node-wget-promise
 
-node-wget-promise simplifies retrieving files from any URL, with Promise support.
+`node-wget-promise` simplifies retrieving files from any URL, with Promise support.
 
 [![npm](https://img.shields.io/npm/v/node-wget-promise.svg)](https://www.npmjs.com/package/node-wget-promise)
 [![Build Status](https://travis-ci.org/ajhsu/node-wget-promise.svg?branch=master)](https://travis-ci.org/ajhsu/node-wget-promise)
@@ -8,42 +8,43 @@ node-wget-promise simplifies retrieving files from any URL, with Promise support
 
 > This package is forked and enhanced from [wget-improved](https://github.com/bearjaws/node-wget)
 
-## Install
+## Installation
 
 ```
 npm install node-wget-promise --save
 ```
 
-## Example
+## Usage
 
-### Basic
+### The simpliest example
 
 ```js
-var wget = require('node-wget-promise');
-var src = 'http://nodejs.org/images/logo.svg';
-var options = {
-  onStart: [Callback],
-  onProgress: [Callback],
-  output: [outputFilePath]
-};
-wget(src, options)
+const wget = require('node-wget-promise');
+
+wget('http://nodejs.org/images/logo.svg');
+```
+
+### The basic example with callbacks
+
+```js
+const wget = require('node-wget-promise');
+
+wget([url], {
+    onStart: [Callback],
+    onProgress: [Callback],
+    output: [outputFilePath]
+  })
   .then(metadata => [fileMetadata])
   .catch(err => [Error]);
 ```
 
-### Simplfied
+### Work with async-await syntax
 
 ```js
-var wget = require('node-wget-promise');
-wget('http://nodejs.org/images/logo.svg');
-```
+const wget = require('node-wget-promise');
 
-### with Async-Await
-
-```js
-var wget = require('node-wget-promise');
 (async () => {
-  await wget('http://nodejs.org/images/logo.svg');
+  await wget([url]);
   console.log('Done');
 })();
 ```
