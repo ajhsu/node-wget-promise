@@ -5,9 +5,9 @@ describe('Integration tests', function() {
   it('should download the file with HTTP protocol', function(done) {
     const Bytes = 1024;
     const fileName = 'logo.svg';
-    wget('http://www.president.gov.tw/images/logo.svg', {
+    wget('http://info.cern.ch/hypertext/WWW/TheProject.html', {
       onStart: headers => {
-        expect(headers['content-type']).toContain('image/svg+xml');
+        expect(headers['content-type']).toContain('text/html');
       },
       onProgress: progress => {
         console.log('downloaded', progress, '%');
@@ -15,7 +15,7 @@ describe('Integration tests', function() {
       output: fileName
     })
       .then(result => {
-        expect(result.headers['content-type']).toContain('image/svg+xml');
+        expect(result.headers['content-type']).toContain('text/html');
         expect(result.fileSize).toBeGreaterThan(0 * Bytes);
         expect(result.fileSize).toBeLessThan(100 * Bytes);
         // Check if file existed
