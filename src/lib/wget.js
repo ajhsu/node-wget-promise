@@ -10,8 +10,8 @@ const fs = require('fs');
  * @param {object} options - Options object
  * @returns {Promise}
  */
-const download = (source, { verbose, output, onStart, onProgress } = {}) => {
-  return new Promise((y, n) => {
+function download(source, { verbose, output, onStart, onProgress } = {}) {
+  return new Promise(function(y, n) {
     if (typeof output === 'undefined') {
       output = path.basename(url.parse(source).pathname) || 'unknown';
     }
@@ -44,7 +44,7 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
         port: sourceUrl.port,
         path: sourceUrl.pathname + (sourceUrl.search || '')
       },
-      res => {
+      function(res) {
         if (res.statusCode === 200) {
           const fileSize = Number.isInteger(res.headers['content-length'] - 0)
             ? parseInt(res.headers['content-length'])
@@ -68,7 +68,7 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
             onStart(res.headers);
           }
 
-          res.on('data', chunk => {
+          res.on('data', function(chunk) {
             downloadedSize += chunk.length;
             if (onProgress) {
               onProgress({
@@ -79,12 +79,12 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
             }
           });
 
-          res.on('error', err => {
+          res.on('error', function(err) {
             writeStream.end();
             n(err);
           });
 
-          writeStream.on('finish', () => {
+          writeStream.on('finish', function() {
             writeStream.end();
             req.end('finished');
             y({ headers: res.headers, fileSize });
@@ -119,6 +119,6 @@ const download = (source, { verbose, output, onStart, onProgress } = {}) => {
     req.end('done');
     req.on('error', err => n(err));
   });
-};
+}
 
 module.exports = download;
