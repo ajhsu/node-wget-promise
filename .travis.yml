@@ -1,21 +1,14 @@
 language: node_js
+env:
+  - FORCE_COLOR=true
 node_js:
-  - "node"
-  - "4"
-  - "5"
   - "6"
   - "7"
   - "8"
   - "9"
   - "10"
-env:
-  - CXX=g++-4.8
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
+  - "11"
+
 notifications:
   email:
-    - sinayamm@gmail.com
+    - im.ajhsu@gmail.com
